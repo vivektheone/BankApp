@@ -1,0 +1,29 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+archivesBaseName = "bank"
+version = '1.0'
+mainClassName = "Bank"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Web framework
+    compile 'com.sparkjava:spark-core:2.5'
+    //Logger
+    compile 'org.slf4j:slf4j-simple:1.7.21'
+    //CQRS impl
+    compile 'org.axonframework:axon-test:4.0.3'
+    compile 'org.axonframework:axon-messaging:4.0.3'
+    compile 'org.axonframework:axon-modelling:4.0.3'
+    compile 'org.axonframework:axon-eventsourcing:4.0.3'
+    compile 'org.axonframework:axon-configuration:4.0.3'
+    //Json support
+    compile 'com.google.code.gson:gson:2.8.5'
+    //Unit test
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+}
