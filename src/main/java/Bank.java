@@ -12,6 +12,7 @@ import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import query.controller.AccountQuery;
+import query.routes.BankRoutes;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -22,7 +23,6 @@ public class Bank {
 
     private static Logger LOGGER = LoggerFactory.getLogger("Bank Logger");
 
-    private static Gson gson = new Gson();
 
     public static void main(String[] args) {
 
@@ -32,35 +32,14 @@ public class Bank {
         Configuration configuration = getConfiguration(eventStore);
         configuration.start();
 
-        Route createAccount = new Route() {
-            @Override
-            public Object handle(Request request, Response response) throws Exception {
-                LOGGER.info("Account create event --> " + request.body());
-                CreateAccountCommand createCommand =
-                        gson.fromJson(request.body(), CreateAccountCommand.class);
-                configuration.commandGateway().send(createCommand);
-                return response;
-            }
-        };
+        Route createAccount = new BankRoutes(configuration).createAccount();
         post("/accounts", createAccount);
 
-
-        Route updateAccount = new Route() {
-            @Override
-            public Object handle(Request request, Response response) throws Exception {
-                LOGGER.info("Account update event --> " + request.body());
-                DepositAmountCommand depositCommand = gson.fromJson(request.body(), DepositAmountCommand.class);
-                if(depositCommand.getAmount() > 0)
-                    configuration.commandGateway().send(depositCommand);
-                else {
-                    WithdrawAmountCommand withDrawCommand = gson.fromJson(request.body(), WithdrawAmountCommand.class);
-                    configuration.commandGateway().send(withDrawCommand);
-                }
-
-                return response;
-            }
-        };
+        Route updateAccount = new BankRoutes(configuration).depositInAccount();
         put("/accounts", updateAccount);
+
+        Route transferFromAccount = new BankRoutes(configuration).transfer();
+        put("/transfer", transferFromAccount);
 
         Route getAccounts = new Route() {
             @Override

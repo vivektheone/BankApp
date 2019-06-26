@@ -2,9 +2,11 @@ package aggregate;
 
 import command.CreateAccountCommand;
 import command.DepositAmountCommand;
+import command.TransferCommand;
 import command.WithdrawAmountCommand;
 import event.AccountCreatedEvent;
 import event.AmountDepositEvent;
+import event.AmountTransferEvent;
 import event.AmountWithdrawEvent;
 import model.Account;
 import org.axonframework.commandhandling.CommandHandler;
@@ -40,6 +42,12 @@ public class AccountAggregate {
     @CommandHandler
     public void withdrawal(WithdrawAmountCommand command) {
         apply(new AmountWithdrawEvent(command.getAccountNumber(), command.getAmount()));
+    }
+
+
+    @CommandHandler
+    public void transfer(TransferCommand command) {
+        apply(new AmountTransferEvent(command.getAccountNumber(), command.getToAccountNumber(), command.getAmount()));
     }
 
 }
