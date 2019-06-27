@@ -11,11 +11,14 @@ import org.slf4j.LoggerFactory;
 import query.AccountView;
 
 import java.util.Timer;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 
 public class AccountEventHandler {
 
     private final Logger LOG = LoggerFactory.getLogger(AccountEventHandler.class);
+    private static int counter = 0;
 
     @EventHandler
     public void handle(AccountCreatedEvent event) {
@@ -41,15 +44,20 @@ public class AccountEventHandler {
 
     @EventHandler
     public void handle(AmountTransferEvent event){
+
         long start = System.nanoTime();
-        LOG.info("From {}, To {}, Wired {} ", event.getFromAccount(), event.getToAccount(), event.getTransferAmount());
         Account fromAccount = AccountView.accounts.get(event.getFromAccount());
         Account toAccount = AccountView.accounts.get(event.getToAccount());
-        fromAccount.setBalance(fromAccount.getBalance() - event.getTransferAmount());
-        toAccount.setBalance(toAccount.getBalance() + event.getTransferAmount());
-        AccountView.accounts.put(fromAccount.getNumber(), fromAccount);
-        AccountView.accounts.put(toAccount.getNumber(), toAccount);
-        LOG.info("From {}, To {}, Wired {} ", event.getFromAccount(), event.getToAccount(), event.getTransferAmount());
+        CompletableFuture.supplyAsync(() -> {
+            counter++;
+            fromAccount.setBalance(fromAccount.getBalance() - event.getTransferAmount());
+            toAccount.setBalance(toAccount.getBalance() + event.getTransferAmount());
+            return true;
+        }).thenRun(() -> {
+            AccountView.accounts.put(fromAccount.getNumber(), fromAccount);
+            AccountView.accounts.put(toAccount.getNumber(), toAccount);
+            LOG.info("From {}, To {}, Wired {}, Count {}", event.getFromAccount(), event.getToAccount(), event.getTransferAmount());
+        });
         LOG.info("Time taken {} nanosec", System.nanoTime() - start);
     }
 }

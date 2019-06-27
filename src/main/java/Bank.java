@@ -32,13 +32,14 @@ public class Bank {
         Configuration configuration = getConfiguration(eventStore);
         configuration.start();
 
-        Route createAccount = new BankRoutes(configuration).createAccount();
+        BankRoutes routes = new BankRoutes(configuration);
+        Route createAccount = routes.createAccount();
         post("/accounts", createAccount);
 
-        Route updateAccount = new BankRoutes(configuration).depositInAccount();
+        Route updateAccount = routes.depositInAccount();
         put("/accounts", updateAccount);
 
-        Route transferFromAccount = new BankRoutes(configuration).transfer();
+        Route transferFromAccount = routes.transfer();
         put("/transfer", transferFromAccount);
 
         Route getAccounts = new Route() {

@@ -14,13 +14,17 @@ java -jar build/libs/bank-1.0.jar
 Shows accounts in console:
 curl -X GET http://localhost:4567/accounts
 
-Create aggregate:
+Create account:
 curl -d '{"accountNumber": "123", "customerName": "Me"}' -X POST http://localhost:4567/accounts
 
 
-Update aggregate (Deposit in account):
+Update account (Deposit in account):
 curl -d '{"accountNumber": "123", "amount": 100}' -X PUT http://localhost:4567/accounts
 
 
-Update aggregate (Withdraw from account):
+Update account (Withdraw from account):
 curl -d '{"accountNumber": "123", "amount": -50}' -X PUT http://localhost:4567/accounts
+
+Transfer accounts (from one account to another)
+curl -d '{"accountNumber": "124", "toAccountNumber":"123","amount": 100}' -X PUT http://localhost:4567/transfer
+
