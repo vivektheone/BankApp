@@ -8,6 +8,7 @@ import command.WithdrawAmountCommand;
 import org.axonframework.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import query.controller.AccountQuery;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -68,5 +69,17 @@ public class BankRoutes {
                 return response;
             }
         };
+    }
+
+
+    public Route fetch() {
+        return new Route() {
+            @Override
+            public Object handle(Request request, Response response) throws Exception {
+                AccountQuery query = new AccountQuery();
+                query.printAccountsDetail();
+                return "Watch console...";
+            }
+        } ;
     }
 }

@@ -9,6 +9,7 @@ public class TransferCommand {
 
     private Double amount;
 
+    @TargetAggregateIdentifier
     private String toAccountNumber;
 
     public TransferCommand(String fromAccountNumber, String toAccountNumber, Double amount) {

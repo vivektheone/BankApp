@@ -20,6 +20,7 @@ public class AccountEventHandler {
     private final Logger LOG = LoggerFactory.getLogger(AccountEventHandler.class);
     private static int counter = 0;
 
+    //Todo: AccountExistEvent to prevent duplicates...
     @EventHandler
     public void handle(AccountCreatedEvent event) {
         AccountView.accounts.put(event.getAccountNumber(), new Account(event.getAccountNumber(), event.getCustomerName()));
@@ -44,20 +45,18 @@ public class AccountEventHandler {
 
     @EventHandler
     public void handle(AmountTransferEvent event){
-
         long start = System.nanoTime();
         Account fromAccount = AccountView.accounts.get(event.getFromAccount());
         Account toAccount = AccountView.accounts.get(event.getToAccount());
         CompletableFuture.supplyAsync(() -> {
-            counter++;
             fromAccount.setBalance(fromAccount.getBalance() - event.getTransferAmount());
             toAccount.setBalance(toAccount.getBalance() + event.getTransferAmount());
             return true;
         }).thenRun(() -> {
-            AccountView.accounts.put(fromAccount.getNumber(), fromAccount);
-            AccountView.accounts.put(toAccount.getNumber(), toAccount);
+            AccountView.accounts.put(event.getFromAccount(), fromAccount);
+            AccountView.accounts.put(event.getToAccount(), toAccount);
             LOG.info("From {}, To {}, Wired {}, Count {}", event.getFromAccount(), event.getToAccount(), event.getTransferAmount());
+            LOG.info("Time taken {} nanosec", System.nanoTime() - start);
         });
-        LOG.info("Time taken {} nanosec", System.nanoTime() - start);
     }
 }
